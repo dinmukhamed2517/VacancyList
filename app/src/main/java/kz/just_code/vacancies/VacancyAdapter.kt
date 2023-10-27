@@ -6,77 +6,100 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import kz.just_code.vacancies.base.BaseVacancyViewHolder
-import kz.just_code.vacancies.databinding.ItemProfessionBinding
+import kz.just_code.vacancies.databinding.HeaderBinding
 import kz.just_code.vacancies.databinding.ItemSpacingBinding
 import kz.just_code.vacancies.databinding.ItemVacancyBinding
 
-class VacancyAdapter:ListAdapter<VacancyDto, BaseVacancyViewHolder<*>>(VacancyDiffUtils()) {
-    class VacancyDiffUtils: DiffUtil.ItemCallback<VacancyDto>(){
-        override fun areItemsTheSame(oldItem: VacancyDto, newItem: VacancyDto): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: VacancyDto, newItem: VacancyDto): Boolean {
-            return oldItem == newItem
-        }
-
-    }
-
-    class VacancyViewHolder(binding:ItemVacancyBinding):BaseVacancyViewHolder<ItemVacancyBinding>(binding){
-        override fun bindView(item: VacancyDto) {
-            with(binding){
-                title.text =item.name
+class VacancyAdapter:ListAdapter<RecyclerViewItem, BaseVacancyViewHolder<*>>(VacancyDiffUtils()) {
+    class VacancyDiffUtils: DiffUtil.ItemCallback<RecyclerViewItem>(){
+        override fun areItemsTheSame(
+            oldItem: RecyclerViewItem,
+            newItem: RecyclerViewItem
+        ): Boolean {
+            if(oldItem.javaClass != newItem.javaClass){
+                return false
+            }
+            return when(oldItem){
+                is RecyclerViewItem.Header -> oldItem.title == (newItem as RecyclerViewItem.Header).title
+                is RecyclerViewItem.Vacancy -> oldItem.vacancyDto.id ==(newItem as RecyclerViewItem.Vacancy).vacancyDto.id
             }
         }
-    }
-    class ProfessionViewHolder(binding:ItemProfessionBinding):BaseVacancyViewHolder<ItemProfessionBinding>(binding){
-        override fun bindView(item: VacancyDto) {
-            with(binding){
-                root.text = item.name
+        override fun areContentsTheSame(
+            oldItem: RecyclerViewItem,
+            newItem: RecyclerViewItem
+        ): Boolean {
+            return when(oldItem){
+                is RecyclerViewItem.Vacancy -> oldItem.vacancyDto == (newItem as RecyclerViewItem.Vacancy).vacancyDto
+                else -> true
             }
         }
 
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseVacancyViewHolder<*> {
-        return when(viewType){
-            VacancyType.PROFESSION_VIEW.ordinal -> ProfessionViewHolder(
-                ItemProfessionBinding.inflate(LayoutInflater.from(parent.context),parent, false)
-            )
-            VacancyType.VACANCY_VIEW.ordinal -> VacancyViewHolder(
-                ItemVacancyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-
+        return when (viewType){
+            Type.HEADER_VIEW.ordinal -> {
+                HeaderViewHolder(
+                    HeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                )
+            }
+            Type.VACANCY_VIEW.ordinal ->{
+                VacancyViewHolder(
+                    ItemVacancyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                )
+            }
             else -> SpacingViewHolder(
                 ItemSpacingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
+    }
+
+
+}
+
+    override fun getItemViewType(position: Int): Int {
+        return when(getItem(position)){
+            is RecyclerViewItem.Vacancy -> Type.VACANCY_VIEW.ordinal
+            is RecyclerViewItem.Header -> Type.HEADER_VIEW.ordinal
         }
     }
 
     override fun onBindViewHolder(holder: BaseVacancyViewHolder<*>, position: Int) {
         holder.bindView(getItem(position))
     }
+
+    class VacancyViewHolder(binding:ItemVacancyBinding):BaseVacancyViewHolder<ItemVacancyBinding>(binding){
+        override fun bindView(item: RecyclerViewItem) {
+            val vacancy = (item as RecyclerViewItem.Vacancy).vacancyDto
+            with(binding){
+                title.text = vacancy.name
+                salary.text = vacancy.salary.toString()
+                req.text = vacancy.requirement
+            }
+        }
+    }
+    class HeaderViewHolder(binding:HeaderBinding):BaseVacancyViewHolder<HeaderBinding>(binding){
+        override fun bindView(item: RecyclerViewItem) {
+            with(binding){
+                root.text = (item as RecyclerViewItem.Header).title
+            }
+        }
+
+    }
+
 }
 
 data class VacancyDto(
     val id: Int,
     val name:String,
-    val type:VacancyType,
-    val professionType:String
+    val type:Type,
+    val salary:Double,
+    val requirement:String,
+    val professionType:String,
+    val description:String,
+    var isLiked:Boolean = false,
 )
 
 
-enum class VacancyType{
-    PROFESSION_VIEW, VACANCY_VIEW, SPACING_VIEW
-}
-
-object UniqueIdGenerator{
-    private var currentId = 0
-    fun generateId():Int{
-        return currentId++
-    }
-}
-
-enum class ProfessionType{
-    ANDROID, IOS, FRONTEND, BACKEND, DESIGNER
+enum class Type{
+    HEADER_VIEW, VACANCY_VIEW, SPACING_VIEW
 }
