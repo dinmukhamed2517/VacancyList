@@ -6,4 +6,5 @@
     <color name="button">#C1F1C3</color>
     <color name="btn_text">#077A0C</color>
     <color name="vacancies_bg">#BFDBD1</color>
+    <color name="red">#FF3333</color>
 </resources>

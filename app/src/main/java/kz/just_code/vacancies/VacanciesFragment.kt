@@ -1,32 +1,28 @@
 package kz.just_code.vacancies
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.parcel.Parcelize
+import kz.just_code.vacancies.base.BaseFragment
 import kz.just_code.vacancies.databinding.FragmentVacanciesBinding
 import kz.just_code.vacancies.decoration.HeaderDecoration
 import kz.just_code.vacancies.decoration.OffsetDecoration
+import kz.just_code.vacancies.model.VacancyDto
 
-class VacanciesFragment:Fragment(){
-    private lateinit var binding: FragmentVacanciesBinding
+class VacanciesFragment:BaseFragment<FragmentVacanciesBinding>(FragmentVacanciesBinding::inflate){
 
     private var vacancyAdapter:VacancyAdapter? = null
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentVacanciesBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onBindView() {
+        super.onBindView()
 
         vacancyAdapter = VacancyAdapter()
         with(binding){
@@ -47,6 +43,11 @@ class VacanciesFragment:Fragment(){
 
                 }
             )
+            vacancyAdapter!!.itemClick = {
+                if (it is RecyclerViewItem.Vacancy){
+                    findNavController().navigate(VacanciesFragmentDirections.actionVacanciesFragmentToVacancyDetailsFragment(it))
+                }
+            }
         }
     }
 }
@@ -103,5 +104,6 @@ private fun getItemsList():List<RecyclerViewItem> {
 }
 sealed class RecyclerViewItem{
     data class Header(val title:String): RecyclerViewItem()
-    data class Vacancy(val vacancyDto: VacancyDto):RecyclerViewItem()
+    @Parcelize
+    data class Vacancy(val vacancyDto: VacancyDto):RecyclerViewItem(), Parcelable
 }

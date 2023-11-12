@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Vacancies</string>
+    <string name="description_placeholder">Can you bring creative human-centered ideas to life and make great things happen beyond what meets the eye? We believe in teamwork, fun, complex projects, diverse perspectives, and simple solutions. How about you? We\'re looking for a like-minded</string>
+    <string name="job_description">Job Description</string>
 </resources>

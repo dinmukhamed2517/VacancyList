@@ -11,6 +11,8 @@ import kz.just_code.vacancies.databinding.ItemSpacingBinding
 import kz.just_code.vacancies.databinding.ItemVacancyBinding
 
 class VacancyAdapter:ListAdapter<RecyclerViewItem, BaseVacancyViewHolder<*>>(VacancyDiffUtils()) {
+
+    var itemClick: ((RecyclerViewItem)-> Unit)? = null
     class VacancyDiffUtils: DiffUtil.ItemCallback<RecyclerViewItem>(){
         override fun areItemsTheSame(
             oldItem: RecyclerViewItem,
@@ -67,13 +69,16 @@ class VacancyAdapter:ListAdapter<RecyclerViewItem, BaseVacancyViewHolder<*>>(Vac
         holder.bindView(getItem(position))
     }
 
-    class VacancyViewHolder(binding:ItemVacancyBinding):BaseVacancyViewHolder<ItemVacancyBinding>(binding){
+    inner class VacancyViewHolder(binding:ItemVacancyBinding):BaseVacancyViewHolder<ItemVacancyBinding>(binding){
         override fun bindView(item: RecyclerViewItem) {
             val vacancy = (item as RecyclerViewItem.Vacancy).vacancyDto
             with(binding){
-                title.text = vacancy.name
+                title.text = vacancy.title
                 salary.text = vacancy.salary.toString()
                 req.text = vacancy.requirement
+            }
+            itemView.setOnClickListener {
+                itemClick?.invoke(item)
             }
         }
     }
@@ -88,16 +93,6 @@ class VacancyAdapter:ListAdapter<RecyclerViewItem, BaseVacancyViewHolder<*>>(Vac
 
 }
 
-data class VacancyDto(
-    val id: Int,
-    val name:String,
-    val type:Type,
-    val salary:Double,
-    val requirement:String,
-    val professionType:String,
-    val description:String,
-    var isLiked:Boolean = false,
-)
 
 
 enum class Type{

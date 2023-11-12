@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="kz.just_code.vacancies.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_vacanciesFragment"
+            app:destination="@id/vacanciesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/vacanciesFragment"
+        android:name="kz.just_code.vacancies.VacanciesFragment"
+        android:label="VacanciesFragment" >
+        <action
+            android:id="@+id/action_vacanciesFragment_to_vacancyDetailsFragment"
+            app:destination="@id/vacancyDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/vacancyDetailsFragment"
+        android:name="kz.just_code.vacancies.VacancyDetailsFragment"
+        android:label="VacancyDetailsFragment" >
+        <argument
+            android:name="vacancyItem"
+            app:argType="kz.just_code.vacancies.RecyclerViewItem$Vacancy" />
+        <action
+            android:id="@+id/action_vacancyDetailsFragment_to_vacanciesFragment"
+            app:destination="@id/vacanciesFragment" />
+    </fragment>
+</navigation>
